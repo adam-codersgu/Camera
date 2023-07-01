@@ -3,8 +3,10 @@ package com.codersguidebook.camera
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -14,6 +16,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.codersguidebook.camera.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.*
+import java.text.SimpleDateFormat
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,6 +48,17 @@ class MainActivity : AppCompatActivity() {
         if (!CameraPermissionHelper.hasCameraPermission(this) || !CameraPermissionHelper.hasStoragePermission(this)) {
             CameraPermissionHelper.requestPermissions(this)
         } else recreate()
+    }
+
+    fun prepareContentValues(): ContentValues {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "image_$timeStamp"
+
+        return ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, imageFileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM")
+        }
     }
 
     object CameraPermissionHelper {
