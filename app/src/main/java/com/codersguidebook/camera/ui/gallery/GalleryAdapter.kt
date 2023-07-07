@@ -27,7 +27,7 @@ class GalleryAdapter(private val activity: MainActivity, private val fragment: G
             }
 
             itemView.setOnLongClickListener {
-                // TODO: Open the popup menu
+                fragment.showPopup(it, photos[layoutPosition])
                 return@setOnLongClickListener true
             }
         }
