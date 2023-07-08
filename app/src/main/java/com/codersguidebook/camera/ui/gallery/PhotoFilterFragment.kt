@@ -1,18 +1,22 @@
 package com.codersguidebook.camera.ui.gallery
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.PointF
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.codersguidebook.camera.MainActivity
 import com.codersguidebook.camera.Photo
 import com.codersguidebook.camera.R
 import com.codersguidebook.camera.databinding.FragmentPhotoFilterBinding
@@ -69,6 +73,8 @@ class PhotoFilterFragment : Fragment() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
+
+        setupMenu()
     }
 
     private fun loadImage(glideFilter: Transformation<Bitmap>?){
@@ -103,6 +109,33 @@ class PhotoFilterFragment : Fragment() {
             "Sketch filter" -> loadImage(SketchFilterTransformation())
             "Toon filter" -> loadImage(ToonFilterTransformation())
         }
+    }
+
+    private fun setupMenu() {
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.photo_filter_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    android.R.id.home -> findNavController().popBackStack()
+                    R.id.save -> {
+                        val image = getBitmapFromView(binding.selectedImage)
+                        if (image != null) (activity as MainActivity).saveImage(image)
+                    }
+                    else -> return false
+                }
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun getBitmapFromView(view: View): Bitmap? {
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
     }
 
     override fun onDestroyView() {

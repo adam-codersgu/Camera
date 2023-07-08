@@ -5,8 +5,10 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -16,8 +18,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.codersguidebook.camera.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.util.*
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -58,6 +62,22 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, imageFileName)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
             put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM")
+        }
+    }
+
+    fun saveImage(bitmap: Bitmap) {
+        val resolver = applicationContext.contentResolver
+        val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, prepareContentValues())
+
+        try {
+            resolver.openOutputStream(imageUri ?: return)?.use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                Toast.makeText(this, resources.getString(R.string.photo_saved), Toast.LENGTH_LONG).show()
+            }
+        } catch (_: FileNotFoundException) {
+            Toast.makeText(this, resources.getString(R.string.error_saving_photo), Toast.LENGTH_LONG).show()
+        } catch (_: IOException) {
+            Toast.makeText(this, resources.getString(R.string.error_saving_photo), Toast.LENGTH_LONG).show()
         }
     }
 
