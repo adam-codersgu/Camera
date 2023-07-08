@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.codersguidebook.camera.MainActivity
@@ -23,7 +24,8 @@ class GalleryAdapter(private val activity: MainActivity, private val fragment: G
         init {
             itemView.isClickable = true
             itemView.setOnClickListener {
-                // TODO: Navigate to the photo filter fragment
+                val action = GalleryFragmentDirections.actionPhotoFilter(photos[layoutPosition])
+                it.findNavController().navigate(action)
             }
 
             itemView.setOnLongClickListener {

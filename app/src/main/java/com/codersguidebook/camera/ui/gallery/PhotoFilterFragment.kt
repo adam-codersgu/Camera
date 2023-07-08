@@ -24,6 +24,11 @@ class PhotoFilterFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        arguments?.let {
+            val safeArgs = PhotoFilterFragmentArgs.fromBundle(it)
+            photo = safeArgs.photo
+        }
+
         _binding = FragmentPhotoFilterBinding.inflate(inflater, container, false)
         return binding.root
     }
