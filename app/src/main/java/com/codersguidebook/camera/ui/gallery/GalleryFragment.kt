@@ -28,6 +28,13 @@ class GalleryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+            result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Toast.makeText(requireContext(), getString(R.string.photo_deleted), Toast.LENGTH_LONG).show()
+        }
+    }
+
     private lateinit var adapter: GalleryAdapter
     private lateinit var viewModel: GalleryViewModel
 
@@ -76,12 +83,7 @@ class GalleryFragment : Fragment() {
             listOf(photo.uri)).intentSender
         val intentSenderRequest = IntentSenderRequest.Builder(intentSender).build()
 
-        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
-                result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                Toast.makeText(requireContext(), getString(R.string.photo_deleted), Toast.LENGTH_LONG).show()
-            }
-        }.launch(intentSenderRequest)
+        launcher.launch(intentSenderRequest)
     }
 
     override fun onDestroyView() {
