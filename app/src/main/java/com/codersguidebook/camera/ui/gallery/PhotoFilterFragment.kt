@@ -4,14 +4,18 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -21,7 +25,12 @@ import com.codersguidebook.camera.Photo
 import com.codersguidebook.camera.R
 import com.codersguidebook.camera.databinding.FragmentPhotoFilterBinding
 import jp.wasabeef.glide.transformations.GrayscaleTransformation
-import jp.wasabeef.glide.transformations.gpu.*
+import jp.wasabeef.glide.transformations.gpu.InvertFilterTransformation
+import jp.wasabeef.glide.transformations.gpu.KuwaharaFilterTransformation
+import jp.wasabeef.glide.transformations.gpu.SketchFilterTransformation
+import jp.wasabeef.glide.transformations.gpu.SwirlFilterTransformation
+import jp.wasabeef.glide.transformations.gpu.ToonFilterTransformation
+import androidx.navigation.fragment.findNavController
 
 class PhotoFilterFragment : Fragment() {
 
@@ -122,7 +131,7 @@ class PhotoFilterFragment : Fragment() {
                     android.R.id.home -> findNavController().popBackStack()
                     R.id.save -> {
                         val image = getBitmapFromView(binding.selectedImage)
-                        if (image != null) (activity as MainActivity).saveImage(image)
+                        (activity as MainActivity).saveImage(image)
                     }
                     else -> return false
                 }
@@ -131,7 +140,7 @@ class PhotoFilterFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun getBitmapFromView(view: View): Bitmap? {
+    private fun getBitmapFromView(view: View): Bitmap {
         val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         view.draw(canvas)
