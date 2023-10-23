@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -21,7 +22,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -78,14 +80,18 @@ class MainActivity : AppCompatActivity() {
 
     object CameraPermissionHelper {
         private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
-        private const val READ_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE
+        private val READ_MEDIA_PERMISSION = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
 
         fun hasCameraPermission(activity: Activity): Boolean {
             return ContextCompat.checkSelfPermission(activity, CAMERA_PERMISSION) == PackageManager.PERMISSION_GRANTED
         }
 
         fun hasStoragePermission(activity: Activity): Boolean {
-            return ContextCompat.checkSelfPermission(activity, READ_PERMISSION) == PackageManager.PERMISSION_GRANTED
+            return ContextCompat.checkSelfPermission(activity, READ_MEDIA_PERMISSION) == PackageManager.PERMISSION_GRANTED
         }
 
         fun requestPermissions(activity: Activity) {
@@ -93,12 +99,14 @@ class MainActivity : AppCompatActivity() {
                 AlertDialog.Builder(activity).apply {
                     setMessage(activity.getString(R.string.permission_required))
                     setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
-                        ActivityCompat.requestPermissions(activity, arrayOf(CAMERA_PERMISSION, READ_PERMISSION), 1)
+                        ActivityCompat.requestPermissions(activity,
+                            arrayOf(CAMERA_PERMISSION, READ_MEDIA_PERMISSION), 1)
                     }
                     show()
                 }
             } else {
-                ActivityCompat.requestPermissions(activity, arrayOf(CAMERA_PERMISSION, READ_PERMISSION), 1)
+                ActivityCompat.requestPermissions(activity,
+                    arrayOf(CAMERA_PERMISSION, READ_MEDIA_PERMISSION), 1)
             }
         }
     }
